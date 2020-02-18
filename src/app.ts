@@ -33,6 +33,6 @@ app.listen(port, err => {
 app.get('/btc', async (req, res) => {
     const output = await client.getBlockchainInfo()
     console.log(output)
-    res.send('finished');
+    res.send(output);
     // res.send('The sedulous hyena ate the antelope!');
   });
