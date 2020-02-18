@@ -1,12 +1,13 @@
 import express from 'express';
 import axios from 'axios';
 import * as btc_cli from 'bitcoin-core';
+import {user,pass} from './credentials';
 
 import Client from 'bitcoin-core';
 const client = new Client({ 
   network: 'mainnet', 
-  username: 'user', 
-  password: 'pass', 
+  username: user, 
+  password: pass, 
   port: 8332 
 });
 
@@ -29,9 +30,8 @@ app.listen(port, err => {
 });
 
 app.get('/btc', async (req, res) => {
-    const [body, headers] = await client.getInfo();
-    console.log(body)
-    console.log(headers)
+    const output = await client.getBlockchainInformation()
+    console.log(output)
     res.send('finished');
     // res.send('The sedulous hyena ate the antelope!');
   });
