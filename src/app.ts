@@ -31,7 +31,8 @@ app.listen(port, err => {
 });
 
 app.get('/btc', async (req, res) => {
-    const output = await client.getBlockchainInfo()
+    // const output = await client.getBlockchainInfo()
+    const output = await client.getBlockByHash('0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206', { extension: 'json' });
     console.log(output)
     res.send(output);
     // res.send('The sedulous hyena ate the antelope!');
