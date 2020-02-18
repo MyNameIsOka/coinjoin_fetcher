@@ -10,7 +10,9 @@ const client = new Client({
   port: 8332 
 });
 
-client.getBlockchainInfo().then((help) => console.log(help));
+async function getInfo() { // min and max included 
+    return await client.getBlockchainInfo();
+}
 
 const app = express();
 const port = 3000;
@@ -25,7 +27,7 @@ app.listen(port, err => {
 });
 
 app.get('/btc', (req, res) => {
-    client.getInfo().then((help) => console.log(help));
-    res.send(this.help);
+    const output = getInfo()
+    res.send(output);
     // res.send('The sedulous hyena ate the antelope!');
   });
