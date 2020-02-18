@@ -2,8 +2,9 @@ import express from 'express';
 import axios from 'axios';
 import * as btc_cli from 'bitcoin-core';
 import {user,pass} from './credentials';
+// import * as Client from 'bitcoin-core';
 
-import Client from 'bitcoin-core';
+const Client = require('bitcoin-core');
 const client = new Client({ 
   network: 'mainnet', 
   username: user, 
