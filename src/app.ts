@@ -10,11 +10,11 @@ const client = new Client({
   port: 8332 
 });
 
-async function getInfo() { // min and max included 
-    const [body, headers] = await client.getInfo();
-    const output = await client.getBlockchainInfo();
-    return [body, headers]
-}
+// async function getInfo() { // min and max included 
+//     const [body, headers] = await client.getInfo();
+//     const output = await client.getBlockchainInfo();
+//     return [body, headers]
+// }
 
 const app = express();
 const port = 3000;
@@ -29,7 +29,7 @@ app.listen(port, err => {
 });
 
 app.get('/btc', async (req, res) => {
-    const [ body, headers] = await getInfo()
+    const [body, headers] = await client.getInfo();
     console.log(body)
     console.log(headers)
     res.send('finished');
