@@ -11,7 +11,8 @@ const client = new Client({
 });
 
 async function getInfo() { // min and max included 
-    return await client.getBlockchainInfo();
+    const output = await client.getBlockchainInfo();
+    return output
 }
 
 const app = express();
@@ -28,6 +29,7 @@ app.listen(port, err => {
 
 app.get('/btc', (req, res) => {
     const output = getInfo()
+    console.log("Done btc call")
     res.send(output);
     // res.send('The sedulous hyena ate the antelope!');
   });
