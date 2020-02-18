@@ -32,7 +32,9 @@ app.listen(port, err => {
 
 app.get('/btc', async (req, res) => {
     // const output = await client.getBlockchainInfo()
-    const output = await client.getBlockByHash('00000000000000000008f36238d569bd444190f9d1846e7306d52da1bdde4df1', { extension: 'json' });
+    
+    const output = await client.getTransactionByHash('1ba2736614b5910a6b702ba63a8424082a659a110d3c7cd2b8552bd9886e3952', { extension: 'json' });
+    // const output = await client.getBlockByHash('00000000000000000008f36238d569bd444190f9d1846e7306d52da1bdde4df1', { extension: 'json' });
     console.log(output)
     res.send(output);
     // res.send('The sedulous hyena ate the antelope!');
