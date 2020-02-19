@@ -18,9 +18,11 @@ export const hostAddr: string = '1.2.3.4';
 `http://127.0.0.1:3000/btc?dateStart=2020-01-29&dateEnd=2020-02-01&filename=output`    
 
 `dateStart` and `dateEnd` have to be set in the format `yyyy-mm-dd`    
-`filename` should be a single word with no special characters 
-3. Wait. The website can be closed at this point. The terminal where `npm run start` was exectued has to remain active.    
-Be careful, as the script is painfully slow. ~20days worth of blockchain take ~4 hours to finish
+`filename` should be a single word with no special characters   
+3. Wait... The website can be closed at this point.    
+The terminal where `npm run start` was exectued has to remain active.    
+**Be careful**, as the script is painfully slow. ~20days worth of blockchain take ~4 hours to finish. The process can be aborted anytime via Ctrl+c (Windows + OSX) in the terminal window, where the `npm run start` command was executed.    
+**NOTE** If the process is aborted, the file will not be created.
 The resulting file can be found in the `data` folder of the project folder.    
 The output will look something like:
 ```
