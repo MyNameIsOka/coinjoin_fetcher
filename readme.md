@@ -21,7 +21,7 @@ export const hostAddr: string = '1.2.3.4';
 `filename` should be a single word with no special characters   
 3. Wait... The website can be closed at this point.    
 The terminal where `npm run start` was exectued has to remain active.    
-**Be careful**, as the script is painfully slow. ~20days worth of blockchain took ~4 hours to finish on a MacBook Retina, 12-inch, Early 2016. The process can be aborted anytime via Ctrl+c (Windows + OSX) in the terminal window, where the `npm run start` command was executed.    
+**Be careful**, as the script is painfully slow. ~20days worth of blockchain took ~4 hours to finish on a MacBook Retina, 12-inch, Early 2016. The process can be aborted anytime via Ctrl+C (Windows + OSX) in the terminal window, where the `npm run start` command was executed.    
 **NOTE**: If the process is aborted, the file will not be created.    
     
 The resulting file can be found in the `data` folder of the project folder.    
