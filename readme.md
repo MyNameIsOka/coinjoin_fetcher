@@ -19,7 +19,8 @@ export const hostAddr: string = '1.2.3.4';
 `filename` should be a single word with no special characters
 3. Wait. The website can be closed at this point. The terminal where `npm run start` was exectued has to remain active.    
 Be careful, as the script is painfully slow. ~20days worth of blockchain take ~4 hours to finish
-The resulting file can be found in the `data` folder of the project folder. The output will look something like:
+The resulting file can be found in the `data` folder of the project folder.    
+The output will look something like:
 ```
 [
   ...
@@ -44,7 +45,7 @@ The resulting file can be found in the `data` folder of the project folder. The 
   ...
 ```
 
-4. After it is finished, the total BTC and USD value can be calculated with:
+4. After it is finished, the total BTC and USD value can be calculated with:    
  `http://127.0.0.1:3000/convert?filename=output`    
 The output will look something like:
 ```
