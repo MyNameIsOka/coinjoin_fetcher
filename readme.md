@@ -14,7 +14,9 @@ export const hostAddr: string = '1.2.3.4';
 
 # Usage
 1. in the root folder: `npm run start`
-2. in your browser, open the website: `http://127.0.0.1:3000/btc?dateStart=2020-01-29&dateEnd=2020-02-01&filename=output`
+2. in your browser, open the website:    
+`http://127.0.0.1:3000/btc?dateStart=2020-01-29&dateEnd=2020-02-01&filename=output`    
+
 `dateStart` and `dateEnd` have to be set in the format `yyyy-mm-dd`
 `filename` should be a single word with no special characters
 3. Wait. The website can be closed at this point. The terminal where `npm run start` was exectued has to remain active.    
