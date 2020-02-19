@@ -35,9 +35,11 @@ app.listen(port, err => {
   return console.log(`server is listening on ${port}`);
 });
 app.get('/convert', async (req, res) => {
+  let filename: string = req.query.filename;
   let USDValue: number = 0;
   let totalBTC: number = 0;
-  const coinjoins = require('../data/coinjoins.json'); // (with path)
+  const coinjoins = require(`../data/${filename}.json`); // (with path)
+  // const coinjoins = require('../data/coinjoins.json'); // (with path)
   for (let coinjoin of coinjoins) {
     USDValue += coinjoin['USD value']
     totalBTC += coinjoin['total BTC']
@@ -70,7 +72,7 @@ app.get('/btc', async (req, res) => {
     if (filename === undefined) {
       filename = 'coinjoins.json'
     }
-    fs.writeFile(`${filename}.json`, result, function(err) {
+    fs.writeFile(`./data/${filename}.json`, result, function(err) {
     if (err) {
         console.log(err);
     }

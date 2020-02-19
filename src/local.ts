@@ -133,7 +133,7 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
     console.log("No. of CoinJoins:",String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
     output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
     // console.log("counterRounds is:",counterRounds)
-    // if (counterRounds === 3) {
+    // if (counterRounds === 10) {
     //   break
     // }
     // counterRounds += 1;
