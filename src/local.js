@@ -194,14 +194,13 @@ function getCoinJoins(dateStart, dateEnd) {
                     }
                     return [4 /*yield*/, client.getBlockByHash(output.previousblockhash, { extension: 'json' })
                         // console.log("counterRounds is:",counterRounds)
+                        // if (counterRounds === 3) {
+                        //   break
+                        // }
+                        // counterRounds += 1;
                     ];
                 case 17:
                     output = _e.sent();
-                    // console.log("counterRounds is:",counterRounds)
-                    if (counterRounds === 3) {
-                        return [3 /*break*/, 18];
-                    }
-                    counterRounds += 1;
                     return [3 /*break*/, 16];
                 case 18:
                     console.log("Starting price action");

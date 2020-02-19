@@ -131,10 +131,10 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
 
     output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
     // console.log("counterRounds is:",counterRounds)
-    if (counterRounds === 3) {
-      break
-    }
-    counterRounds += 1;
+    // if (counterRounds === 3) {
+    //   break
+    // }
+    // counterRounds += 1;
   }
 console.log("Starting price action")
 for (let entry of found) {
