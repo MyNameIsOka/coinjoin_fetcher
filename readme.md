@@ -1,5 +1,6 @@
 # Prerequisites
 1. nodejs and npm
+2. Fully synced bitcoind node with `-txindex=1`, `-server=1` and `-rest=1` set
 
 # Installation
 1. Pull this repository
