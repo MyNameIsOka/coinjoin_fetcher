@@ -1,6 +1,6 @@
 import  express = require('express');
 var reload = require('express-reload')
-import {user,pass} from './credentials';
+import {user,pass,hostAddr} from './credentials';
 import axios from 'axios';
 
 const Client = require('bitcoin-core');
@@ -9,7 +9,7 @@ const client = new Client({
   username: user, 
   password: pass, 
   port: 8332,
-  host: '18.177.119.49'
+  host: hostAddr
 });
 export function Unix_timestamp(t)
 {
@@ -29,9 +29,7 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
   const ddEnd = String(DateEnd.getUTCDate()).padStart(2, '0');
   const mmEnd = String(DateEnd.getUTCMonth() + 1).padStart(2, '0');
   const yyyyEnd = DateEnd.getUTCFullYear();
-  const dateEndString = ddEnd + '-' + mmEnd + '-' + yyyyEnd;
-  console.log("DateStart", DateStart)
-  console.log("DateEnd", DateEnd)
+  const dateEndString = ddEnd.substr(-2) + '-' + mmEnd.substr(-2) + '-' + yyyyEnd;
   const unixStart = DateStart.getTime()/1000.0;
   const unixEnd = DateEnd.getTime()/1000.0;
   const now = new Date();
@@ -54,12 +52,13 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
   }
 
   try{
-    const url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
+    console.log("dateEnd is: ", dateEndString)
+    const url = `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${dateEndString}`
     const response = await axios.get(url, { timeout: 10000} );
     let date = Unix_timestamp(unixToday)
-    priceHistory[date] = response.data.bitcoin.usd
-  } catch {
-    // continue
+    priceHistory[dateEndString] = response.data.market_data.current_price.usd
+  } catch(e) {
+    console.log(e)
   }
   console.log("Coingecko response\n",priceHistory)
 
@@ -75,6 +74,7 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
     const diffSecs = unixToday - unixEnd
     const diffBlocks = Math.round(diffSecs / 600);
     const targetBlockHeight = output.blocks - diffBlocks
+    console.log("Starting from block",targetBlockHeight)
     const blockstat = await client.getBlockStats(targetBlockHeight)
     output = await client.getBlockHeadersByHash(blockstat.blockhash, 1, { extension: 'json' });
     blockhash = output[0].hash;
@@ -133,7 +133,7 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
     console.log("No. of CoinJoins:",String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
     output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
     // console.log("counterRounds is:",counterRounds)
-    // if (counterRounds === 10) {
+    // if (counterRounds === 3) {
     //   break
     // }
     // counterRounds += 1;
