@@ -1,15 +1,19 @@
-import express from 'express';
-import axios from 'axios';
-import * as btc_cli from 'bitcoin-core';
+// import express from 'express';
+import  express = require('express');
+// var reload = require('express-reload')
 import {user,pass} from './credentials';
-// import * as Client from 'bitcoin-core';
+import * as bitcoin from 'bitcoinjs-lib';
+import * as block from '../data/block.json'
+import { getCoinJoins } from './local'
 
+var fs = require('fs');
 const Client = require('bitcoin-core');
 const client = new Client({ 
   network: 'mainnet', 
   username: user, 
   password: pass, 
-  port: 8332 
+  port: 8332,
+  host: '18.177.119.49'
 });
 
 // async function getInfo() { // min and max included 
@@ -17,11 +21,12 @@ const client = new Client({
 //     const output = await client.getBlockchainInfo();
 //     return [body, headers]
 // }
+// const path = __dirname + '/app.js'
 
 const app = express();
 const port = 3000;
-app.get('/', (req, res) => {
-  res.send('The sedulous hyena ate the antelope!');
+app.get('/', (req, res, next) => {
+  res.send('Up and running!');
 });
 app.listen(port, err => {
   if (err) {
@@ -31,10 +36,26 @@ app.listen(port, err => {
 });
 
 app.get('/btc', async (req, res) => {
-    // const output = await client.getBlockchainInformation()
-    const output = await client.getTransactionByHash('1ba2736614b5910a6b702ba63a8424082a659a110d3c7cd2b8552bd9886e3952', { extension: 'json' });
-    // const output = await client.getBlockByHash('00000000000000000008f36238d569bd444190f9d1846e7306d52da1bdde4df1', { extension: 'json' });
-    console.log(output)
-    res.send(output);
+    const dateStart = req.query.dateStart;
+    const dateEnd = req.query.dateEnd;
+    console.log(dateStart)
+    console.log(dateEnd)
+    const output = await client.getBlockchainInformation();
+    const output2 = await client.getBlockHeadersByHash(output.bestblockhash, 1, { extension: 'json' });
+    // const output = await client.getInfo()
+    const found = await getCoinJoins(dateStart,dateEnd)
+    const result = JSON.stringify(found)
+    fs.writeFile("coinjoins.json", result, function(err) {
+    if (err) {
+        console.log(err);
+    }
+});
+    // const output = await client.getTransactionByHash('1ba2736614b5910a6b702ba63a8424082a659a110d3c7cd2b8552bd9886e3952', { extension: 'json' });
+    // const output = block
+    // console.log(output)
+    // res.send(found);
+    res.send(result);
     // res.send('The sedulous hyena ate the antelope!');
   });
+
+// app.use(reload(path))

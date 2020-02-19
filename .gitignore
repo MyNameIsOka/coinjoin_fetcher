@@ -1,2 +1,7 @@
 node_modules
 src/credentials.ts
+.DS_Store
+coinjoins.json
+data
+src/credentials.js
+src/credentials.js.map

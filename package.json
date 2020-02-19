@@ -2,21 +2,23 @@
   "name": "coinjoin_fetcher",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "start": "tsc && node ./src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.17.2",
+    "express-reload": "^1.2.0",
     "tslint": "^6.0.0",
     "typescript": "^3.7.5"
   },
   "dependencies": {
     "axios": "^0.19.0",
     "bitcoin-core": "^3.0.0",
+    "bitcoinjs-lib": "^5.1.7",
     "express": "^4.17.1"
   }
 }
