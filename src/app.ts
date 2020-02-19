@@ -1,19 +1,19 @@
 // import express from 'express';
 import  express = require('express');
 // var reload = require('express-reload')
-import {user,pass} from './credentials';
+import {user,pass,hostAddr} from './credentials';
 import * as bitcoin from 'bitcoinjs-lib';
 import * as block from '../data/block.json'
 import { getCoinJoins } from './local'
 
 var fs = require('fs');
 const Client = require('bitcoin-core');
-const client = new Client({ 
-  network: 'mainnet', 
-  username: user, 
-  password: pass, 
+const client = new Client({
+  network: 'mainnet',
+  username: user,
+  password: pass,
   port: 8332,
-  host: '18.177.119.49'
+  host: hostAddr
 });
 
 // async function getInfo() { // min and max included 
