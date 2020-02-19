@@ -102,9 +102,11 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
         coinjoins.push(CoinJoinTx)
       }
     }
-    console.log("No. of transactions:",String(coinjoins.length).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
+
     // targetBlockHeight
+    let cjCount = 0;
     for(let entries of coinjoins) {
+
       const separateValues = [];
       let count = {};
       let highest = '';
@@ -117,6 +119,7 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
       highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
 
       if (Number(highest) >= denomination && count[highest] >= iMax/2) {
+        cjCount += 1;
         // console.log("highest output is: ", highest)
         // console.log("count of highest output is: ", count[highest])
       found.push({
@@ -126,12 +129,11 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
         'count': count[highest],
         'txid': entries.txid})
       }
-      // entries = [];
     }
-
+    console.log("No. of CoinJoins:",String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
     output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
     // console.log("counterRounds is:",counterRounds)
-    // if (counterRounds === 3) {
+    // if (counterRounds === 10) {
     //   break
     // }
     // counterRounds += 1;

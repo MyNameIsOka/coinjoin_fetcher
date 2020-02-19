@@ -48,7 +48,7 @@ var client = new Client({
     username: credentials_1.user,
     password: credentials_1.pass,
     port: 8332,
-    host: '18.177.119.49'
+    host: credentials_1.hostAddr
 });
 // async function getInfo() { // min and max included 
 //     const [body, headers] = await client.getInfo();

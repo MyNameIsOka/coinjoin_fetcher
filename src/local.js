@@ -57,7 +57,7 @@ function Unix_timestamp(t) {
 exports.Unix_timestamp = Unix_timestamp;
 function getCoinJoins(dateStart, dateEnd) {
     return __awaiter(this, void 0, void 0, function () {
-        var DateStart, ddStart, mmStart, yyyyStart, dateStartString, DateEnd, ddEnd, mmEnd, yyyyEnd, dateEndString, unixStart, unixEnd, now, today, unixToday, dd, mm, yyyy, todayString, unixDate, temp, priceHistory, date, url, response, url, response, date, _a, output, blockhash, diffSecs, diffBlocks, targetBlockHeight, blockstat, coinjoins, found, iMax, denomination, counterRounds, date, CoinJoinTx, _i, _b, i, _loop_1, _c, coinjoins_1, entries, _d, found_1, entry, calculate;
+        var DateStart, ddStart, mmStart, yyyyStart, dateStartString, DateEnd, ddEnd, mmEnd, yyyyEnd, dateEndString, unixStart, unixEnd, now, today, unixToday, dd, mm, yyyy, todayString, unixDate, temp, priceHistory, date, url, response, url, response, date, _a, output, blockhash, diffSecs, diffBlocks, targetBlockHeight, blockstat, coinjoins, found, iMax, denomination, counterRounds, date, CoinJoinTx, _i, _b, i, cjCount, _loop_1, _c, coinjoins_1, entries, _d, found_1, entry, calculate;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -162,7 +162,7 @@ function getCoinJoins(dateStart, dateEnd) {
                             coinjoins.push(CoinJoinTx);
                         }
                     }
-                    console.log("No. of transactions:", String(coinjoins.length).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ') + ', approx.', String(Math.round((output.mediantime - unixStart) / 600)).padStart(4, ' '), 'blocks left');
+                    cjCount = 0;
                     _loop_1 = function (entries) {
                         var separateValues = [];
                         var count = {};
@@ -176,6 +176,7 @@ function getCoinJoins(dateStart, dateEnd) {
                         // console.log(count);
                         highest = Object.keys(count).reduce(function (a, b) { return count[a] > count[b] ? a : b; });
                         if (Number(highest) >= denomination && count[highest] >= iMax / 2) {
+                            cjCount += 1;
                             // console.log("highest output is: ", highest)
                             // console.log("count of highest output is: ", count[highest])
                             found.push({
@@ -187,20 +188,19 @@ function getCoinJoins(dateStart, dateEnd) {
                             });
                         }
                     };
-                    // targetBlockHeight
                     for (_c = 0, coinjoins_1 = coinjoins; _c < coinjoins_1.length; _c++) {
                         entries = coinjoins_1[_c];
                         _loop_1(entries);
                     }
-                    return [4 /*yield*/, client.getBlockByHash(output.previousblockhash, { extension: 'json' })
-                        // console.log("counterRounds is:",counterRounds)
-                        // if (counterRounds === 3) {
-                        //   break
-                        // }
-                        // counterRounds += 1;
-                    ];
+                    console.log("No. of CoinJoins:", String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ') + ', approx.', String(Math.round((output.mediantime - unixStart) / 600)).padStart(4, ' '), 'blocks left');
+                    return [4 /*yield*/, client.getBlockByHash(output.previousblockhash, { extension: 'json' })];
                 case 17:
                     output = _e.sent();
+                    console.log("counterRounds is:", counterRounds);
+                    if (counterRounds === 10) {
+                        return [3 /*break*/, 18];
+                    }
+                    counterRounds += 1;
                     return [3 /*break*/, 16];
                 case 18:
                     console.log("Starting price action");
