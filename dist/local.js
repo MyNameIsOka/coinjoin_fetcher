@@ -124,7 +124,7 @@ function getCoinJoins(dateStart, dateEnd) {
                 separateValues.forEach(function (i) { count[i] = (count[i] || 0) + 1; });
                 // console.log(count);
                 highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
-                if (Number(highest) >= denomination && count[highest] >= iMax / 2) {
+                if (Number(highest) >= denomination && count[highest] >= iMax / 2 && Number(entries.vin.length) >= iMax / 2) {
                     cjCount += 1;
                     // console.log("highest output is: ", highest)
                     // console.log("count of highest output is: ", count[highest])

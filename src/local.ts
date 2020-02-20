@@ -106,7 +106,6 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
     // targetBlockHeight
     let cjCount = 0;
     for(let entries of coinjoins) {
-
       const separateValues = [];
       let count = {};
       let highest = '';
@@ -118,7 +117,7 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
       // console.log(count);
       highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
 
-      if (Number(highest) >= denomination && count[highest] >= iMax/2) {
+      if (Number(highest) >= denomination && count[highest] >= iMax/2 && Number(entries.vin.length) >= iMax/2) {
         cjCount += 1;
         // console.log("highest output is: ", highest)
         // console.log("count of highest output is: ", count[highest])
