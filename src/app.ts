@@ -38,11 +38,13 @@ app.get('/convert', async (req, res) => {
   let filename: string = req.query.filename;
   let USDValue: number = 0;
   let totalBTC: number = 0;
+  let coinjoinCount: number = 0;
   const coinjoins = require(`../data/${filename}.json`); // (with path)
   // const coinjoins = require('../data/coinjoins.json'); // (with path)
   for (let coinjoin of coinjoins) {
     USDValue += coinjoin['USD value']
     totalBTC += coinjoin['total BTC']
+    coinjoinCount += 1;
   }
   const separateValues = [];
   let count = {};
@@ -57,7 +59,7 @@ app.get('/convert', async (req, res) => {
   // console.log("count of txids", Object.keys(count).length)
   // console.log("highes count:", count[highest])
   // console.log("Length of file entries",coinjoins.length)
-  const result = `USD value: $${Math.round(USDValue)},  total BTC: ${totalBTC}`
+  const result = `USD value: $${Math.round(USDValue)},  total BTC: ${totalBTC}, number of CoinJoins: ${coinjoinCount}`
   res.send(result);
 
 })
