@@ -6,7 +6,8 @@
     - fetch results from remote
     - set file name according to dates 
 3. Parallelize calculation
-4. Use a proper DB
+4. Use a proper DB 
+5. Fetch available results
 
 
 # Prerequisites
