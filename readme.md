@@ -1,3 +1,14 @@
+# ToDo
+1. Speed up. It's slow.
+    - fetch all necessary blocks first and then analyze
+2. Improve the commands. 
+    - Check if previously started analysis is already finished
+    - fetch results from remote
+    - set file name according to dates 
+3. Parallelize calculation
+4. Use a proper DB
+
+
 # Prerequisites
 1. nodejs and npm
 2. Fully synced bitcoind node with `-txindex=1`, `-server=1` and `-rest=1` set
