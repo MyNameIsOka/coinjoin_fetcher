@@ -7,7 +7,8 @@
     - set file name according to dates 
 3. Parallelize calculation
 4. Use a proper DB 
-5. Fetch available results
+5. Fetch available results 
+6. Add Coinjoins from Samourai Wallet
 
 
 # Prerequisites
