@@ -1,6 +1,6 @@
 # ToDo
 1. Speed up. It's slow.
-    - fetch all necessary blocks first and then analyze
+    - Fetch blocks locally from blk files
 2. Improve the commands. 
     - Check if previously started analysis is already finished
     - fetch results from remote
