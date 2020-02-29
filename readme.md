@@ -8,8 +8,9 @@
 3. Parallelize calculation
 4. Use a proper DB 
 5. Fetch available results 
-6. Add Coinjoins from Samourai Wallet 
-7. Delete entries out of the defined time duration. Currently too many TXs are fetched sometimes.
+6. Add Coinjoins from Samourai Wallet    
+7. ~~Delete entries out of the defined time duration. Currently too many TXs are fetched sometimes.~~
+8. Start from the correct date. The unix time conversion is not accurate enough, right now.
 
 
 # Prerequisites
