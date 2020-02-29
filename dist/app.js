@@ -9,11 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import express from 'express';
 const express = require("express");
-// var reload = require('express-reload')
 const credentials_1 = require("./credentials");
-// import * as block from '../data/block.json'
 const local_1 = require("./local");
 var fs = require('fs');
 const Client = require('bitcoin-core');
@@ -24,12 +21,6 @@ const client = new Client({
     port: 8332,
     host: credentials_1.hostAddr
 });
-// async function getInfo() { // min and max included 
-//     const [body, headers] = await client.getInfo();
-//     const output = await client.getBlockchainInfo();
-//     return [body, headers]
-// }
-// const path = __dirname + '/app.js'
 const app = express();
 const port = 3000;
 app.get('/', (req, res, next) => {

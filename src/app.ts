@@ -1,9 +1,5 @@
-// import express from 'express';
 import  express = require('express');
-// var reload = require('express-reload')
 import {user,pass,hostAddr} from './credentials';
-import * as bitcoin from 'bitcoinjs-lib';
-// import * as block from '../data/block.json'
 import { getCoinJoins } from './local'
 
 var fs = require('fs');
@@ -15,13 +11,6 @@ const client = new Client({
   port: 8332,
   host: hostAddr
 });
-
-// async function getInfo() { // min and max included 
-//     const [body, headers] = await client.getInfo();
-//     const output = await client.getBlockchainInfo();
-//     return [body, headers]
-// }
-// const path = __dirname + '/app.js'
 
 const app = express();
 const port = 3000;

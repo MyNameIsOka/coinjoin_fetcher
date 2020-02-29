@@ -5,3 +5,4 @@ dist/credentials.js.map
 .DS_Store
 coinjoins.json
 data
+src/credentials.js

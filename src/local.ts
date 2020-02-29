@@ -3,6 +3,7 @@ var reload = require('express-reload')
 import {user,pass,hostAddr} from './credentials';
 import axios from 'axios';
 
+
 const Client = require('bitcoin-core');
 const client = new Client({ 
   network: 'mainnet', 
@@ -105,9 +106,9 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
 
     // targetBlockHeight
     let cjCount = 0;
-    for(let entries of coinjoins) {
+    for(const entries of coinjoins) {
       const separateValues = [];
-      let count = {};
+      const count = {};
       let highest = '';
       let values: any = []
       for (values of entries.vout) {
@@ -121,12 +122,24 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
         cjCount += 1;
         // console.log("highest output is: ", highest)
         // console.log("count of highest output is: ", count[highest])
-      found.push({
-        'height': output.height,
-        'date': date,
-        'value': highest,
-        'count': count[highest],
-        'txid': entries.txid})
+        const calculate: number = priceHistory[date]
+        const totalBTC = Number(highest) * Number(count[highest])
+        const usdValue = calculate * totalBTC
+        console.log("Dollar value is:", usdValue)
+        if (isNaN(usdValue)) {
+          cjCount -= 1;
+          continue
+        }
+        found.push({
+          'height': output.height,
+          'date': date,
+          'value': highest,
+          'count': count[highest],
+          'txid': entries.txid,
+          'total BTC': totalBTC,
+          'USD value': usdValue
+        })
+        console.log(found)
       }
     }
     console.log("No. of CoinJoins:",String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
@@ -137,15 +150,7 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
     // }
     // counterRounds += 1;
   }
-console.log("Starting price action")
-for (let entry of found) {
-let calculate: number = priceHistory[entry['date']]
-console.log("Fetch price", calculate)
-entry['total BTC'] = Number(entry['value']) * Number(entry['count'])
-entry['USD value'] = calculate * entry['total BTC']
-
-}
-console.log(found)
+  console.log(found)
 return found
 
 }
