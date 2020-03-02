@@ -1,5 +1,5 @@
 # ToDo
-1. Speed up. It's slow.
+1. Speed up
     - Fetch blocks locally from blk files
 2. Improve the commands. 
     - Check if previously started analysis is already finished
@@ -8,9 +8,9 @@
 3. Parallelize calculation
 4. Use a proper DB 
 5. Fetch available results 
-6. Add Coinjoins from Samourai Wallet    
+6. ~~Add Coinjoins from Samourai Wallet~~    
 7. ~~Delete entries out of the defined time duration. Currently too many TXs are fetched sometimes.~~
-8. Start from the correct date. The unix time conversion is not accurate enough, right now.
+8. ~~Start from the correct date. The unix time conversion is not accurate enough, right now.~~    
 
 
 # Prerequisites
@@ -34,12 +34,12 @@ export const hostAddr: string = '1.2.3.4';
 `http://127.0.0.1:3000/btc?dateStart=2020-01-29&dateEnd=2020-02-01&filename=output`    
 `dateStart` and `dateEnd` have to be set in the format `yyyy-mm-dd`    
 `filename` should be a single word with no special characters   
-3. Wait... The website can be closed at this point.    
+3. Wait until the calculation is finished. This might take a while... The website can be closed at this point.    
 The terminal where `npm run start` was exectued has to remain active.    
 **Be careful**, as the script is painfully slow. ~20days worth of blockchain took ~4 hours to finish on a MacBook Retina, 12-inch, Early 2016. The process can be aborted anytime via Ctrl+C (Windows + OSX) in the terminal window, where the `npm run start` command was executed.    
 **NOTE**: If the process is aborted, the file will not be created.    
-    
-The resulting file can be found in the `data` folder of the project folder.    
+4. When the calculation is finished, the found CoinJoins can be found in a JSON file with the specified name in the `data` folder
+        
 The output will look something like:
 ```
 [
