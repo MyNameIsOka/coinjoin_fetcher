@@ -34,15 +34,25 @@ app.listen(port, err => {
 });
 app.get('/convert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let filename = req.query.filename;
-    let USDValue = 0;
-    let totalBTC = 0;
+    let USDValueWasabi = 0;
+    let totalBTCWasabi = 0;
+    let USDValueSamourai = 0;
+    let totalBTCSamourai = 0;
     let coinjoinCount = 0;
+    let WasabiCount = 0;
+    let SamouraiCount = 0;
     const coinjoins = require(`../data/${filename}.json`); // (with path)
-    // const coinjoins = require('../data/coinjoins.json'); // (with path)
     for (let coinjoin of coinjoins) {
-        USDValue += coinjoin['USD value'];
-        totalBTC += coinjoin['total BTC'];
-        coinjoinCount += 1;
+        if (coinjoin.type === 'Wasabi') {
+            USDValueWasabi += coinjoin['USDValue'];
+            totalBTCWasabi += coinjoin['totalBTC'];
+            WasabiCount += 1;
+        }
+        else if (coinjoin.type === 'Samourai') {
+            USDValueSamourai += coinjoin['USDvalue'];
+            totalBTCSamourai += coinjoin['totalBTC'];
+            SamouraiCount += 1;
+        }
     }
     const separateValues = [];
     let count = {};
@@ -53,11 +63,14 @@ app.get('/convert', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
     separateValues.forEach(function (i) { count[i] = (count[i] || 0) + 1; });
     highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
+    if (Number(highest) > 1) {
+        throw new Error('txids have been saved multiple times. Check the calculation');
+    }
     // console.log("separate txids:", separateValues)
     // console.log("count of txids", Object.keys(count).length)
     // console.log("highes count:", count[highest])
     // console.log("Length of file entries",coinjoins.length)
-    const result = `USD value: $${Math.round(USDValue)},  total BTC: ${totalBTC}, number of CoinJoins: ${coinjoinCount}`;
+    const result = `USD value Wasabi: $${Math.round(USDValueWasabi)},  total BTC Wasabi: ${totalBTCWasabi}, number of Wasabi CoinJoins: ${WasabiCount}\nUSD value Samourai: ${Math.round(USDValueSamourai)},  total BTC Samourai: ${totalBTCSamourai}, number of Samourai CoinJoins: ${SamouraiCount}`;
     res.send(result);
 }));
 app.get('/btc', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

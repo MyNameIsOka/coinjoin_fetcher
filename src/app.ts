@@ -25,15 +25,25 @@ app.listen(port, err => {
 });
 app.get('/convert', async (req, res) => {
   let filename: string = req.query.filename;
-  let USDValue: number = 0;
-  let totalBTC: number = 0;
+  let USDValueWasabi: number = 0;
+  let totalBTCWasabi: number = 0;
+  let USDValueSamourai: number = 0;
+  let totalBTCSamourai: number = 0;
   let coinjoinCount: number = 0;
+  let WasabiCount: number = 0;
+  let SamouraiCount: number = 0;
+
   const coinjoins = require(`../data/${filename}.json`); // (with path)
-  // const coinjoins = require('../data/coinjoins.json'); // (with path)
   for (let coinjoin of coinjoins) {
-    USDValue += coinjoin['USD value']
-    totalBTC += coinjoin['total BTC']
-    coinjoinCount += 1;
+    if ( coinjoin.type === 'Wasabi' ) {
+      USDValueWasabi += coinjoin['USDValue']
+      totalBTCWasabi += coinjoin['totalBTC']
+      WasabiCount += 1;
+    } else if ( coinjoin.type === 'Samourai' ) {
+      USDValueSamourai += coinjoin['USDValue']
+      totalBTCSamourai += coinjoin['totalBTC']
+      SamouraiCount += 1;
+    }
   }
   const separateValues = [];
   let count = {};
@@ -44,11 +54,14 @@ app.get('/convert', async (req, res) => {
   }
   separateValues.forEach(function(i) { count[i] = (count[i]||0) + 1;});
   highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
+  if (Number(highest) > 1) {
+    throw new Error('txids have been saved multiple times. Check the calculation')
+  }
   // console.log("separate txids:", separateValues)
   // console.log("count of txids", Object.keys(count).length)
   // console.log("highes count:", count[highest])
   // console.log("Length of file entries",coinjoins.length)
-  const result = `USD value: $${Math.round(USDValue)},  total BTC: ${totalBTC}, number of CoinJoins: ${coinjoinCount}`
+  const result = `USD value Wasabi: $${Math.round(USDValueWasabi)},  total BTC Wasabi: ${totalBTCWasabi}, number of Wasabi CoinJoins: ${WasabiCount}\nUSD value Samourai: ${Math.round(USDValueSamourai)},  total BTC Samourai: ${totalBTCSamourai}, number of Samourai CoinJoins: ${SamouraiCount}`
   res.send(result);
 
 })

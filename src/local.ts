@@ -166,7 +166,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
           'count': count[highest],
           'txid': entry.txid,
           'totalBTC': totalBTC,
-          'USDvalue': usdValue,
+          'USDValue': usdValue,
           'type': CoinJoinType
         })
       }

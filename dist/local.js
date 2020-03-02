@@ -115,21 +115,11 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
             let CoinJoinTx = [];
             coinjoins = [];
             for (CoinJoinTx of output.tx) {
-                if (CoinJoinTx.vout.length === 5) {
-                    console.log(CoinJoinTx.txid);
-                    console.log("Potential Whirlpool");
-                    console.log(CoinJoinTx.vout[0].value);
-                    console.log(CoinJoinTx.vout[1].value);
-                    console.log(CoinJoinTx.vout[2].value);
-                    console.log(CoinJoinTx.vout[3].value);
-                    console.log(CoinJoinTx.vout[4].value);
-                }
                 let i = CoinJoinTx.vout.length;
                 if (i > iMax) {
                     coinjoins.push(CoinJoinTx);
                 }
                 else if ((CoinJoinTx.vout.length === 5) && (CoinJoinTx.vin.length === 5) && [CoinJoinTx.vout[0].value, CoinJoinTx.vout[1].value, CoinJoinTx.vout[2].value, CoinJoinTx.vout[3].value, CoinJoinTx.vout[4].value].every(Object.is.bind(0, CoinJoinTx.vout[0].value))) {
-                    console.log("WhirlPool found");
                     coinjoins.push(CoinJoinTx);
                 }
             }
@@ -171,8 +161,6 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                 else if (entry.vout.length === 5) {
                     const CoinJoinType = 'Samourai';
                     whirlpoolCount += 1;
-                    console.log("value of whirlpool TX:", entry.vout.value);
-                    console.log("length of whirlpool TX:", entry.vout.length);
                     const calculate = priceHistory[date];
                     const totalBTC = entry.vout[0].value * entry.vout.length;
                     const usdValue = calculate * totalBTC;
@@ -193,12 +181,11 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                 }
             }
             if (found.length === 0) {
-                console.log("\nNo CoinJoin found in block:", output.height + ', approx.', String(Math.round((output.mediantime - unixStart) / 600)).padStart(4, ' '), 'blocks left');
+                console.log("No. of CoinJoins:", String(0).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ') + ', approx.', String(Math.round((output.mediantime - unixStart) / 600)).padStart(4, ' '), 'blocks left');
                 found = [];
                 output = yield client.getBlockByHash(output.previousblockhash, { extension: 'json' });
                 continue;
             }
-            console.log("\"found\" data\n", found);
             if (initial === true) {
                 const result = JSON.stringify(found);
                 if (filename === undefined) {
@@ -218,9 +205,6 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                     }
                     else {
                         const obj = JSON.parse(data);
-                        console.log("\nread file data\n", obj);
-                        // const foundStringified = JSON.stringify(found)
-                        console.log("\n \"found\" data to be pushed to the file\n", found);
                         obj.push(...found);
                         const result = JSON.stringify(obj);
                         fs.writeFile(`./data/${filename}.json`, result, function (err) {
@@ -231,7 +215,7 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                     }
                 });
             }
-            console.log("No. of CoinJoins:", String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ') + ', approx.', String(Math.round((output.mediantime - unixStart) / 600)).padStart(4, ' '), 'blocks left');
+            console.log("No. of CoinJoins:", String(cjCount + whirlpoolCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ') + ', approx.', String(Math.round((output.mediantime - unixStart) / 600)).padStart(4, ' '), 'blocks left');
             output = yield client.getBlockByHash(output.previousblockhash, { extension: 'json' });
             // console.log("counterRounds is:",counterRounds)
             // if (counterRounds === 10) {
