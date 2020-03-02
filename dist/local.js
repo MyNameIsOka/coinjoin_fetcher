@@ -115,25 +115,40 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
             let CoinJoinTx = [];
             coinjoins = [];
             for (CoinJoinTx of output.tx) {
+                if (CoinJoinTx.vout.length === 5) {
+                    console.log(CoinJoinTx.txid);
+                    console.log("Potential Whirlpool");
+                    console.log(CoinJoinTx.vout[0].value);
+                    console.log(CoinJoinTx.vout[1].value);
+                    console.log(CoinJoinTx.vout[2].value);
+                    console.log(CoinJoinTx.vout[3].value);
+                    console.log(CoinJoinTx.vout[4].value);
+                }
                 let i = CoinJoinTx.vout.length;
                 if (i > iMax) {
+                    coinjoins.push(CoinJoinTx);
+                }
+                else if ((CoinJoinTx.vout.length === 5) && (CoinJoinTx.vin.length === 5) && [CoinJoinTx.vout[0].value, CoinJoinTx.vout[1].value, CoinJoinTx.vout[2].value, CoinJoinTx.vout[3].value, CoinJoinTx.vout[4].value].every(Object.is.bind(0, CoinJoinTx.vout[0].value))) {
+                    console.log("WhirlPool found");
                     coinjoins.push(CoinJoinTx);
                 }
             }
             // targetBlockHeight
             let cjCount = 0;
-            for (const entries of coinjoins) {
+            let whirlpoolCount = 0;
+            for (const entry of coinjoins) {
                 const separateValues = [];
                 const count = {};
                 let highest = '';
                 let values = [];
-                for (values of entries.vout) {
+                for (values of entry.vout) {
                     separateValues.push(values.value);
                 }
                 separateValues.forEach(function (i) { count[i] = (count[i] || 0) + 1; });
                 // console.log(count);
                 highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
-                if (Number(highest) >= denomination && count[highest] >= iMax / 2 && Number(entries.vin.length) >= iMax / 2) {
+                if (Number(highest) >= denomination && count[highest] >= iMax / 2 && Number(entry.vin.length) >= iMax / 2) {
+                    const CoinJoinType = 'Wasabi';
                     cjCount += 1;
                     const calculate = priceHistory[date];
                     const totalBTC = Number(highest) * Number(count[highest]);
@@ -147,14 +162,38 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                         'date': date,
                         'value': highest,
                         'count': count[highest],
-                        'txid': entries.txid,
-                        'total BTC': totalBTC,
-                        'USD value': usdValue
+                        'txid': entry.txid,
+                        'totalBTC': totalBTC,
+                        'USDValue': usdValue,
+                        'type': CoinJoinType
+                    });
+                }
+                else if (entry.vout.length === 5) {
+                    const CoinJoinType = 'Samourai';
+                    whirlpoolCount += 1;
+                    console.log("value of whirlpool TX:", entry.vout.value);
+                    console.log("length of whirlpool TX:", entry.vout.length);
+                    const calculate = priceHistory[date];
+                    const totalBTC = entry.vout[0].value * entry.vout.length;
+                    const usdValue = calculate * totalBTC;
+                    if (isNaN(usdValue)) {
+                        whirlpoolCount -= 1;
+                        continue;
+                    }
+                    found.push({
+                        'height': output.height,
+                        'date': date,
+                        'value': highest,
+                        'count': count[highest],
+                        'txid': entry.txid,
+                        'totalBTC': totalBTC,
+                        'USDvalue': usdValue,
+                        'type': CoinJoinType
                     });
                 }
             }
             if (found.length === 0) {
-                console.log("\nNo CoinJoin found in block:", output.height);
+                console.log("\nNo CoinJoin found in block:", output.height + ', approx.', String(Math.round((output.mediantime - unixStart) / 600)).padStart(4, ' '), 'blocks left');
                 found = [];
                 output = yield client.getBlockByHash(output.previousblockhash, { extension: 'json' });
                 continue;

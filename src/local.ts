@@ -93,6 +93,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
 
   console.log("getBlockHeadersByHash:\n", output)
   output = await client.getBlockByHash(blockhash, { extension: 'json' })
+  console.log("First fetched block data:\n", output)
   let coinjoins = [];
   // let found = [];
   const iMax: number = 50
@@ -109,24 +110,28 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
       let i: number = CoinJoinTx.vout.length
       if (i > iMax) {
         coinjoins.push(CoinJoinTx)
+      } else if ((CoinJoinTx.vout.length as number === 5) && (CoinJoinTx.vin.length as number === 5) && [CoinJoinTx.vout[0].value, CoinJoinTx.vout[1].value, CoinJoinTx.vout[2].value, CoinJoinTx.vout[3].value, CoinJoinTx.vout[4].value].every(Object.is.bind(0,CoinJoinTx.vout[0].value))) {
+        coinjoins.push(CoinJoinTx)
       }
     }
 
     // targetBlockHeight
     let cjCount = 0;
-    for(const entries of coinjoins) {
+    let whirlpoolCount = 0;
+    for(const entry of coinjoins) {
       const separateValues = [];
       const count = {};
       let highest = '';
       let values: any = []
-      for (values of entries.vout) {
+      for (values of entry.vout) {
         separateValues.push(values.value)
       }
       separateValues.forEach(function(i) { count[i] = (count[i]||0) + 1;});
       // console.log(count);
       highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
 
-      if (Number(highest) >= denomination && count[highest] >= iMax/2 && Number(entries.vin.length) >= iMax/2) {
+      if (Number(highest) >= denomination && count[highest] >= iMax/2 && Number(entry.vin.length) >= iMax/2) {
+        const CoinJoinType = 'Wasabi'
         cjCount += 1;
         const calculate: number = priceHistory[date]
         const totalBTC = Number(highest) * Number(count[highest])
@@ -140,19 +145,39 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
           'date': date,
           'value': highest,
           'count': count[highest],
-          'txid': entries.txid,
-          'total BTC': totalBTC,
-          'USD value': usdValue
+          'txid': entry.txid,
+          'totalBTC': totalBTC,
+          'USDValue': usdValue,
+          'type': CoinJoinType
+        })
+      } else if (entry.vout.length as number === 5) {
+        const CoinJoinType = 'Samourai'
+        whirlpoolCount += 1;
+        const calculate: number = priceHistory[date]
+        const totalBTC = entry.vout[0].value * entry.vout.length
+        const usdValue = calculate * totalBTC
+        if (isNaN(usdValue)) {
+          whirlpoolCount -= 1;
+          continue
+        }
+        found.push({
+          'height': output.height,
+          'date': date,
+          'value': highest,
+          'count': count[highest],
+          'txid': entry.txid,
+          'totalBTC': totalBTC,
+          'USDvalue': usdValue,
+          'type': CoinJoinType
         })
       }
     }
     if (found.length === 0) {
-      console.log("\nNo CoinJoin found in block:", output.height)
+      console.log("\nNo CoinJoin found in block:", output.height + ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
       found = [];
       output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
       continue
     }
-    console.log("\"found\" data\n",found)
     if (initial === true) {
       const result = JSON.stringify(found)
       if (filename === undefined) {
@@ -170,9 +195,6 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
             console.log(err);
         } else {
         const obj = JSON.parse(data);
-        console.log("\nread file data\n", obj)
-        // const foundStringified = JSON.stringify(found)
-        console.log("\n \"found\" data to be pushed to the file\n",found)
         obj.push(...found);
         const result = JSON.stringify(obj);
         fs.writeFile(`./data/${filename}.json`, result, function(err) {
