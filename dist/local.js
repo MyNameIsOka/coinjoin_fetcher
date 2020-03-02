@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var reload = require('express-reload');
 const credentials_1 = require("./credentials");
 const axios_1 = __importDefault(require("axios"));
+var fs = require('fs');
 const Client = require('bitcoin-core');
 const client = new Client({
     network: 'mainnet',
@@ -31,14 +32,16 @@ function Unix_timestamp(t) {
     return date.substr(-2) + '-' + month.substr(-2) + '-' + year;
 }
 exports.Unix_timestamp = Unix_timestamp;
-function getCoinJoins(dateStart, dateEnd) {
+function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
     return __awaiter(this, void 0, void 0, function* () {
+        let found;
         const DateStart = new Date(dateStart + 'T00:00:00Z');
         const ddStart = String(DateStart.getUTCDate()).padStart(2, '0');
         const mmStart = String(DateStart.getUTCMonth() + 1).padStart(2, '0');
         const yyyyStart = DateStart.getUTCFullYear();
         const dateStartString = ddStart + '-' + mmStart + '-' + yyyyStart;
-        const DateEnd = new Date(dateEnd + 'T00:00:00Z');
+        const _DateEnd = new Date(dateEnd + 'T00:00:00Z');
+        const DateEnd = new Date(Date.UTC(_DateEnd.getUTCFullYear(), _DateEnd.getUTCMonth(), _DateEnd.getUTCDate()));
         const ddEnd = String(DateEnd.getUTCDate()).padStart(2, '0');
         const mmEnd = String(DateEnd.getUTCMonth() + 1).padStart(2, '0');
         const yyyyEnd = DateEnd.getUTCFullYear();
@@ -85,9 +88,12 @@ function getCoinJoins(dateStart, dateEnd) {
             const diffSecs = unixToday - unixEnd;
             const diffBlocks = Math.round(diffSecs / 600);
             const targetBlockHeight = output.blocks - diffBlocks;
-            console.log("Starting from block", targetBlockHeight);
             const blockstat = yield client.getBlockStats(targetBlockHeight);
             output = yield client.getBlockHeadersByHash(blockstat.blockhash, 1, { extension: 'json' });
+            while (output[0].mediantime > unixEnd) {
+                output = yield client.getBlockHeadersByHash(output[0].previousblockhash, 1, { extension: 'json' });
+            }
+            console.log("\nStarting from block height:", output[0].height);
             blockhash = output[0].hash;
         }
         else {
@@ -95,14 +101,17 @@ function getCoinJoins(dateStart, dateEnd) {
             output = yield client.getBlockchainInformation();
             blockhash = output.bestblockhash;
         }
+        console.log("getBlockHeadersByHash:\n", output);
         output = yield client.getBlockByHash(blockhash, { extension: 'json' });
         let coinjoins = [];
-        const found = [];
+        // let found = [];
         const iMax = 50;
         const denomination = 0.05;
         let counterRounds = 0;
+        let initial = true;
         while (output.mediantime > unixStart) {
             const date = Unix_timestamp(output.mediantime);
+            found = [];
             let CoinJoinTx = [];
             coinjoins = [];
             for (CoinJoinTx of output.tx) {
@@ -126,12 +135,9 @@ function getCoinJoins(dateStart, dateEnd) {
                 highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
                 if (Number(highest) >= denomination && count[highest] >= iMax / 2 && Number(entries.vin.length) >= iMax / 2) {
                     cjCount += 1;
-                    // console.log("highest output is: ", highest)
-                    // console.log("count of highest output is: ", count[highest])
                     const calculate = priceHistory[date];
                     const totalBTC = Number(highest) * Number(count[highest]);
                     const usdValue = calculate * totalBTC;
-                    console.log("Dollar value is:", usdValue);
                     if (isNaN(usdValue)) {
                         cjCount -= 1;
                         continue;
@@ -145,8 +151,46 @@ function getCoinJoins(dateStart, dateEnd) {
                         'total BTC': totalBTC,
                         'USD value': usdValue
                     });
-                    console.log(found);
                 }
+            }
+            if (found.length === 0) {
+                console.log("\nNo CoinJoin found in block:", output.height);
+                found = [];
+                output = yield client.getBlockByHash(output.previousblockhash, { extension: 'json' });
+                continue;
+            }
+            console.log("\"found\" data\n", found);
+            if (initial === true) {
+                const result = JSON.stringify(found);
+                if (filename === undefined) {
+                    filename = 'coinjoins.json';
+                }
+                yield fs.writeFile(`./data/${filename}.json`, result, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                initial = false;
+            }
+            else {
+                yield fs.readFile(`./data/${filename}.json`, 'utf8', yield function (err, data) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                        const obj = JSON.parse(data);
+                        console.log("\nread file data\n", obj);
+                        // const foundStringified = JSON.stringify(found)
+                        console.log("\n \"found\" data to be pushed to the file\n", found);
+                        obj.push(...found);
+                        const result = JSON.stringify(obj);
+                        fs.writeFile(`./data/${filename}.json`, result, function (err) {
+                            if (err) {
+                                console.log(err);
+                            }
+                        });
+                    }
+                });
             }
             console.log("No. of CoinJoins:", String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ') + ', approx.', String(Math.round((output.mediantime - unixStart) / 600)).padStart(4, ' '), 'blocks left');
             output = yield client.getBlockByHash(output.previousblockhash, { extension: 'json' });

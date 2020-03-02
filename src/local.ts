@@ -2,6 +2,7 @@ import  express = require('express');
 var reload = require('express-reload')
 import {user,pass,hostAddr} from './credentials';
 import axios from 'axios';
+var fs = require('fs');
 
 
 const Client = require('bitcoin-core');
@@ -20,13 +21,15 @@ const month = "0" + String(Number(dt.getUTCMonth())+1);
 const date = "0" + dt.getUTCDate();
 return date.substr(-2)+ '-' + month.substr(-2) + '-' + year;
 }
-export async function getCoinJoins(dateStart: string,dateEnd: string) {
+export async function getCoinJoins(dateStart: string, dateEnd: string, filename: string, withWhirlpool: boolean) {
+  let found
   const DateStart = new Date(dateStart + 'T00:00:00Z');
   const ddStart = String(DateStart.getUTCDate()).padStart(2, '0');
   const mmStart = String(DateStart.getUTCMonth() + 1).padStart(2, '0');
   const yyyyStart = DateStart.getUTCFullYear();
   const dateStartString = ddStart + '-' + mmStart + '-' + yyyyStart;
-  const DateEnd = new Date(dateEnd + 'T00:00:00Z');
+  const _DateEnd = new Date(dateEnd + 'T00:00:00Z');
+  const DateEnd = new Date(Date.UTC(_DateEnd.getUTCFullYear(), _DateEnd.getUTCMonth(), _DateEnd.getUTCDate()));
   const ddEnd = String(DateEnd.getUTCDate()).padStart(2, '0');
   const mmEnd = String(DateEnd.getUTCMonth() + 1).padStart(2, '0');
   const yyyyEnd = DateEnd.getUTCFullYear();
@@ -75,9 +78,12 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
     const diffSecs = unixToday - unixEnd
     const diffBlocks = Math.round(diffSecs / 600);
     const targetBlockHeight = output.blocks - diffBlocks
-    console.log("Starting from block",targetBlockHeight)
     const blockstat = await client.getBlockStats(targetBlockHeight)
     output = await client.getBlockHeadersByHash(blockstat.blockhash, 1, { extension: 'json' });
+    while (output[0].mediantime > unixEnd) {
+      output = await client.getBlockHeadersByHash(output[0].previousblockhash, 1, { extension: 'json' });
+    }
+    console.log("\nStarting from block height:", output[0].height)
     blockhash = output[0].hash;
   } else {
     console.log("Starting from most recent block")
@@ -85,16 +91,18 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
     blockhash = output.bestblockhash;
   }
 
-
+  console.log("getBlockHeadersByHash:\n", output)
   output = await client.getBlockByHash(blockhash, { extension: 'json' })
   let coinjoins = [];
-  const found = [];
+  // let found = [];
   const iMax: number = 50
   const denomination: number = 0.05;
 
   let counterRounds = 0;
+  let initial: boolean = true;
   while (output.mediantime > unixStart) {
     const date = Unix_timestamp(output.mediantime)
+    found = [];
     let CoinJoinTx: any = []
     coinjoins = [];
     for (CoinJoinTx of output.tx) {
@@ -120,12 +128,9 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
 
       if (Number(highest) >= denomination && count[highest] >= iMax/2 && Number(entries.vin.length) >= iMax/2) {
         cjCount += 1;
-        // console.log("highest output is: ", highest)
-        // console.log("count of highest output is: ", count[highest])
         const calculate: number = priceHistory[date]
         const totalBTC = Number(highest) * Number(count[highest])
         const usdValue = calculate * totalBTC
-        console.log("Dollar value is:", usdValue)
         if (isNaN(usdValue)) {
           cjCount -= 1;
           continue
@@ -139,9 +144,46 @@ export async function getCoinJoins(dateStart: string,dateEnd: string) {
           'total BTC': totalBTC,
           'USD value': usdValue
         })
-        console.log(found)
       }
     }
+    if (found.length === 0) {
+      console.log("\nNo CoinJoin found in block:", output.height)
+      found = [];
+      output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
+      continue
+    }
+    console.log("\"found\" data\n",found)
+    if (initial === true) {
+      const result = JSON.stringify(found)
+      if (filename === undefined) {
+        filename = 'coinjoins.json'
+      }
+      await fs.writeFile(`./data/${filename}.json`, result, function(err) {
+      if (err) {
+        console.log(err);
+        }
+      });
+      initial = false
+    } else {
+      await fs.readFile(`./data/${filename}.json`, 'utf8', await function(err, data){
+        if (err){
+            console.log(err);
+        } else {
+        const obj = JSON.parse(data);
+        console.log("\nread file data\n", obj)
+        // const foundStringified = JSON.stringify(found)
+        console.log("\n \"found\" data to be pushed to the file\n",found)
+        obj.push(...found);
+        const result = JSON.stringify(obj);
+        fs.writeFile(`./data/${filename}.json`, result, function(err) {
+          if (err) {
+            console.log(err);
+            }
+          });
+    }});
+    }
+
+
     console.log("No. of CoinJoins:",String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
     output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
     // console.log("counterRounds is:",counterRounds)

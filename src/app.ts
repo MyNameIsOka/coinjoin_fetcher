@@ -55,18 +55,19 @@ app.get('/convert', async (req, res) => {
 app.get('/btc', async (req, res) => {
     const dateStart = req.query.dateStart;
     const dateEnd = req.query.dateEnd;
+    const withWhirlpool = req.query.SamouraiWhirlpool;
     let filename: string = req.query.filename;
     console.log(dateStart)
     console.log(dateEnd)
-    const found = await getCoinJoins(dateStart,dateEnd)
+    const found = await getCoinJoins(dateStart, dateEnd, filename, withWhirlpool)
     const result = JSON.stringify(found)
-    if (filename === undefined) {
-      filename = 'coinjoins.json'
-    }
-    fs.writeFile(`./data/${filename}.json`, result, function(err) {
-    if (err) {
-        console.log(err);
-    }
-});
+    // if (filename === undefined) {
+    //   filename = 'coinjoins.json'
+    // }
+    // fs.writeFile(`./data/${filename}.json`, result, function(err) {
+    // if (err) {
+    //   console.log(err);
+    //   }
+    // });
     res.send(result);
   });
