@@ -49,7 +49,7 @@ app.get('/convert', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             WasabiCount += 1;
         }
         else if (coinjoin.type === 'Samourai') {
-            USDValueSamourai += coinjoin['USDvalue'];
+            USDValueSamourai += coinjoin['USDValue'];
             totalBTCSamourai += coinjoin['totalBTC'];
             SamouraiCount += 1;
         }
