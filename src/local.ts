@@ -205,7 +205,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
     }
 
 
-    console.log("No. of CoinJoins:",String(cjCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
+    console.log("No. of CoinJoins:",String(cjCount + whirlpoolCount).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
     output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
     // console.log("counterRounds is:",counterRounds)
     // if (counterRounds === 10) {
