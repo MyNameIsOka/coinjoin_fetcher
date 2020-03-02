@@ -93,7 +93,6 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
 
   console.log("getBlockHeadersByHash:\n", output)
   output = await client.getBlockByHash(blockhash, { extension: 'json' })
-  console.log("First fetched block data:\n", output)
   let coinjoins = [];
   // let found = [];
   const iMax: number = 50
@@ -173,7 +172,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
       }
     }
     if (found.length === 0) {
-      console.log("\nNo CoinJoin found in block:", output.height + ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
+      console.log("No. of CoinJoins:",String(0).padStart(3, ' '), "in block", String(output.height).padStart(7, ' ')+ ', approx.', String(Math.round((output.mediantime-unixStart)/600)).padStart(4, ' '), 'blocks left')
       found = [];
       output = await client.getBlockByHash(output.previousblockhash, { extension: 'json' })
       continue
