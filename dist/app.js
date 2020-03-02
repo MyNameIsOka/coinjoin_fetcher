@@ -70,7 +70,7 @@ app.get('/convert', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     // console.log("count of txids", Object.keys(count).length)
     // console.log("highes count:", count[highest])
     // console.log("Length of file entries",coinjoins.length)
-    const result = `USD value Wasabi: $${Math.round(USDValueWasabi)},  total BTC Wasabi: ${totalBTCWasabi}, number of Wasabi CoinJoins: ${WasabiCount}\nUSD value Samourai: ${Math.round(USDValueSamourai)},  total BTC Samourai: ${totalBTCSamourai}, number of Samourai CoinJoins: ${SamouraiCount}`;
+    const result = `USD value Wasabi: $${Math.round(USDValueWasabi)},  total BTC Wasabi: ${totalBTCWasabi}, number of Wasabi CoinJoins: ${WasabiCount}\nUSD value Samourai: $${Math.round(USDValueSamourai)},  total BTC Samourai: ${totalBTCSamourai}, number of Samourai CoinJoins: ${SamouraiCount}`;
     res.send(result);
 }));
 app.get('/btc', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
