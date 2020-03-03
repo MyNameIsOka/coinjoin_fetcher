@@ -47,6 +47,8 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
 
   let unixDate = unixStart
   const priceHistory = [];
+  console.log("unixDate:", unixDate)
+  console.log("unixEnd:", unixEnd)
   while (unixDate < unixEnd) {
     const date = Unix_timestamp(unixDate)
     const url = `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${date}`
