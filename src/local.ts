@@ -1,15 +1,16 @@
 import  express = require('express');
-var reload = require('express-reload')
 import {user,pass,hostAddr} from './credentials';
 import axios from 'axios';
-var fs = require('fs');
+// tslint:disable-next-line: no-var-requires
+const fs = require('fs');
 
 
+// tslint:disable-next-line: no-var-requires
 const Client = require('bitcoin-core');
-const client = new Client({ 
-  network: 'mainnet', 
-  username: user, 
-  password: pass, 
+const client = new Client({
+  network: 'mainnet',
+  username: user,
+  password: pass,
   port: 8332,
   host: hostAddr
 });
@@ -23,13 +24,13 @@ return date.substr(-2)+ '-' + month.substr(-2) + '-' + year;
 }
 export async function getCoinJoins(dateStart: string, dateEnd: string, filename: string, withWhirlpool: boolean) {
   let found
-  const DateStart = new Date(dateStart + 'T23:59:59Z');
+  const DateStart = new Date(dateStart + '00:00:00Z');
   const ddStart = String(DateStart.getUTCDate()).padStart(2, '0');
   const mmStart = String(DateStart.getUTCMonth() + 1).padStart(2, '0');
   const yyyyStart = DateStart.getUTCFullYear();
   const dateStartString = ddStart + '-' + mmStart + '-' + yyyyStart;
   const _DateEnd = new Date(dateEnd + 'T23:59:59Z');
-  const DateEnd = new Date(Date.UTC(_DateEnd.getUTCFullYear(), _DateEnd.getUTCMonth(), _DateEnd.getUTCDate()));
+  const DateEnd = new Date(Date.UTC(_DateEnd.getUTCFullYear(), _DateEnd.getUTCMonth(), _DateEnd.getUTCDate(), _DateEnd.getUTCHours(), _DateEnd.getUTCMinutes(), _DateEnd.getUTCSeconds()));
   const ddEnd = String(DateEnd.getUTCDate()).padStart(2, '0');
   const mmEnd = String(DateEnd.getUTCMonth() + 1).padStart(2, '0');
   const yyyyEnd = DateEnd.getUTCFullYear();
@@ -39,16 +40,15 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
   const now = new Date();
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   const unixToday = today.getTime()/1000.0;
-  var dd = String(today.getDate()).padStart(2, '0');
-  var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
-  var yyyy = today.getFullYear();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+  const yyyy = today.getFullYear();
   const todayString = yyyy + '-' + mm + '-' + dd;
 
   let unixDate = unixStart
-  let temp = 0;
   const priceHistory = [];
   while (unixDate < unixEnd) {
-    let date = Unix_timestamp(unixDate)
+    const date = Unix_timestamp(unixDate)
     const url = `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${date}`
     const response = await axios.get(url, { timeout: 10000} );
     priceHistory[date] = response.data.market_data.current_price.usd
@@ -59,7 +59,6 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
     console.log("dateEnd is: ", dateEndString)
     const url = `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${dateEndString}`
     const response = await axios.get(url, { timeout: 10000} );
-    let date = Unix_timestamp(unixToday)
     priceHistory[dateEndString] = response.data.market_data.current_price.usd
   } catch(e) {
     console.log(e)
@@ -98,7 +97,6 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
   const iMax: number = 50
   const denomination: number = 0.05;
 
-  let counterRounds = 0;
   let initial: boolean = true;
   while (output.mediantime > unixStart) {
     const date = Unix_timestamp(output.mediantime)
@@ -106,7 +104,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
     let CoinJoinTx: any = []
     coinjoins = [];
     for (CoinJoinTx of output.tx) {
-      let i: number = CoinJoinTx.vout.length
+      const i: number = CoinJoinTx.vout.length
       if (i > iMax) {
         coinjoins.push(CoinJoinTx)
       } else if ((CoinJoinTx.vout.length as number === 5) && (CoinJoinTx.vin.length as number === 5) && [CoinJoinTx.vout[0].value, CoinJoinTx.vout[1].value, CoinJoinTx.vout[2].value, CoinJoinTx.vout[3].value, CoinJoinTx.vout[4].value].every(Object.is.bind(0,CoinJoinTx.vout[0].value))) {
@@ -125,6 +123,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
       for (values of entry.vout) {
         separateValues.push(values.value)
       }
+      // tslint:disable-next-line: only-arrow-functions
       separateValues.forEach(function(i) { count[i] = (count[i]||0) + 1;});
       // console.log(count);
       highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
@@ -182,6 +181,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
       if (filename === undefined) {
         filename = 'coinjoins.json'
       }
+      // tslint:disable-next-line: only-arrow-functions
       await fs.writeFile(`./data/${filename}.json`, result, function(err) {
       if (err) {
         console.log(err);
@@ -189,6 +189,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
       });
       initial = false
     } else {
+      // tslint:disable-next-line: only-arrow-functions
       await fs.readFile(`./data/${filename}.json`, 'utf8', await function(err, data){
         if (err){
             console.log(err);
@@ -196,6 +197,7 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
         const obj = JSON.parse(data);
         obj.push(...found);
         const result = JSON.stringify(obj);
+        // tslint:disable-next-line: no-shadowed-variable && only-arrow-functions
         fs.writeFile(`./data/${filename}.json`, result, function(err) {
           if (err) {
             console.log(err);
