@@ -24,7 +24,7 @@ return date.substr(-2)+ '-' + month.substr(-2) + '-' + year;
 }
 export async function getCoinJoins(dateStart: string, dateEnd: string, filename: string, withWhirlpool: boolean) {
   let found
-  const DateStart = new Date(dateStart + '00:00:00Z');
+  const DateStart = new Date(dateStart + 'T00:00:00Z');
   const ddStart = String(DateStart.getUTCDate()).padStart(2, '0');
   const mmStart = String(DateStart.getUTCMonth() + 1).padStart(2, '0');
   const yyyyStart = DateStart.getUTCFullYear();
