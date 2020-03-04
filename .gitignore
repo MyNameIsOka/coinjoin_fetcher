@@ -9,3 +9,4 @@ data
 src/credentials.js
 CoinJoins.numbers
 output.log
+src/.credentials.ts.swp
