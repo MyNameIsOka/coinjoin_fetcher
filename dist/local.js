@@ -159,7 +159,7 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                         'type': CoinJoinType
                     });
                 }
-                else if (entry.vout.length === 5) {
+                else if (entry.vout.length === 5 && (entry.vout[0].value === 0.01 || entry.vout[0].value === 0.05 || entry.vout[0].value === 0.5)) {
                     const CoinJoinType = 'Samourai';
                     whirlpoolCount += 1;
                     const calculate = priceHistory[date];
