@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var reload = require('express-reload');
 const credentials_1 = require("./credentials");
 const axios_1 = __importDefault(require("axios"));
-var fs = require('fs');
+// tslint:disable-next-line: no-var-requires
+const fs = require('fs');
+// tslint:disable-next-line: no-var-requires
 const Client = require('bitcoin-core');
 const client = new Client({
     network: 'mainnet',
@@ -40,8 +41,8 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
         const mmStart = String(DateStart.getUTCMonth() + 1).padStart(2, '0');
         const yyyyStart = DateStart.getUTCFullYear();
         const dateStartString = ddStart + '-' + mmStart + '-' + yyyyStart;
-        const _DateEnd = new Date(dateEnd + 'T00:00:00Z');
-        const DateEnd = new Date(Date.UTC(_DateEnd.getUTCFullYear(), _DateEnd.getUTCMonth(), _DateEnd.getUTCDate()));
+        const _DateEnd = new Date(dateEnd + 'T23:59:59Z');
+        const DateEnd = new Date(Date.UTC(_DateEnd.getUTCFullYear(), _DateEnd.getUTCMonth(), _DateEnd.getUTCDate(), _DateEnd.getUTCHours(), _DateEnd.getUTCMinutes(), _DateEnd.getUTCSeconds()));
         const ddEnd = String(DateEnd.getUTCDate()).padStart(2, '0');
         const mmEnd = String(DateEnd.getUTCMonth() + 1).padStart(2, '0');
         const yyyyEnd = DateEnd.getUTCFullYear();
@@ -51,15 +52,16 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
         const now = new Date();
         const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
         const unixToday = today.getTime() / 1000.0;
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
-        var yyyy = today.getFullYear();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+        const yyyy = today.getFullYear();
         const todayString = yyyy + '-' + mm + '-' + dd;
         let unixDate = unixStart;
-        let temp = 0;
         const priceHistory = [];
+        console.log("unixDate:", unixDate);
+        console.log("unixEnd:", unixEnd);
         while (unixDate < unixEnd) {
-            let date = Unix_timestamp(unixDate);
+            const date = Unix_timestamp(unixDate);
             const url = `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${date}`;
             const response = yield axios_1.default.get(url, { timeout: 10000 });
             priceHistory[date] = response.data.market_data.current_price.usd;
@@ -69,7 +71,6 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
             console.log("dateEnd is: ", dateEndString);
             const url = `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=${dateEndString}`;
             const response = yield axios_1.default.get(url, { timeout: 10000 });
-            let date = Unix_timestamp(unixToday);
             priceHistory[dateEndString] = response.data.market_data.current_price.usd;
         }
         catch (e) {
@@ -107,7 +108,6 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
         // let found = [];
         const iMax = 50;
         const denomination = 0.05;
-        let counterRounds = 0;
         let initial = true;
         while (output.mediantime > unixStart) {
             const date = Unix_timestamp(output.mediantime);
@@ -115,7 +115,7 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
             let CoinJoinTx = [];
             coinjoins = [];
             for (CoinJoinTx of output.tx) {
-                let i = CoinJoinTx.vout.length;
+                const i = CoinJoinTx.vout.length;
                 if (i > iMax) {
                     coinjoins.push(CoinJoinTx);
                 }
@@ -134,6 +134,7 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                 for (values of entry.vout) {
                     separateValues.push(values.value);
                 }
+                // tslint:disable-next-line: only-arrow-functions
                 separateValues.forEach(function (i) { count[i] = (count[i] || 0) + 1; });
                 // console.log(count);
                 highest = Object.keys(count).reduce((a, b) => count[a] > count[b] ? a : b);
@@ -191,6 +192,7 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                 if (filename === undefined) {
                     filename = 'coinjoins.json';
                 }
+                // tslint:disable-next-line: only-arrow-functions
                 yield fs.writeFile(`./data/${filename}.json`, result, function (err) {
                     if (err) {
                         console.log(err);
@@ -199,6 +201,7 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                 initial = false;
             }
             else {
+                // tslint:disable-next-line: only-arrow-functions
                 yield fs.readFile(`./data/${filename}.json`, 'utf8', yield function (err, data) {
                     if (err) {
                         console.log(err);
@@ -207,6 +210,7 @@ function getCoinJoins(dateStart, dateEnd, filename, withWhirlpool) {
                         const obj = JSON.parse(data);
                         obj.push(...found);
                         const result = JSON.stringify(obj);
+                        // tslint:disable-next-line: no-shadowed-variable && only-arrow-functions
                         fs.writeFile(`./data/${filename}.json`, result, function (err) {
                             if (err) {
                                 console.log(err);
