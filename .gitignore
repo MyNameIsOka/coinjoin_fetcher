@@ -3,7 +3,7 @@ src/credentials.ts
 dist/
 .DS_Store
 coinjoins.json
-data/*
+data/*.json
 !/data/index.js
 src/credentials.js
 CoinJoins.numbers

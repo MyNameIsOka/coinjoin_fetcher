@@ -1,8 +1,8 @@
 import { user, pass, hostAddr } from './credentials';
 import axios from 'axios';
 import * as fs from 'fs';
-
 import { CoinJoins } from './app';
+import { equalOutputs, denomination } from './params';
 
 import Client from 'bitcoin-core';
 const client = new Client({
@@ -110,8 +110,8 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
   output = await client.getBlockByHash(blockhash, { extension: 'json' });
   let coinjoins = [];
   // let found = [];
-  const iMax = 50;
-  const denomination = 0.05;
+  const iMax = equalOutputs * 2;
+  // const denomination = 0.05;
 
   let initial = true;
 
@@ -162,7 +162,11 @@ export async function getCoinJoins(dateStart: string, dateEnd: string, filename:
 
       highest = Object.keys(count).reduce((a, b) => (count[a] > count[b] ? a : b));
 
-      if (Number(highest) >= denomination && count[highest] >= iMax / 2 && Number(entry.vin.length) >= iMax / 2) {
+      if (
+        Number(highest) >= denomination &&
+        count[highest] >= equalOutputs &&
+        Number(entry.vin.length) >= equalOutputs
+      ) {
         const CoinJoinType = 'Wasabi';
 
         cjCount += 1;
