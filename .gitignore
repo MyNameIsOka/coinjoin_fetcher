@@ -1,7 +1,6 @@
 node_modules
 src/credentials.ts
-dist/credentials.js
-dist/credentials.js.map
+dist/
 .DS_Store
 coinjoins.json
 data/*

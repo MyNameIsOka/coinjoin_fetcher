@@ -1,0 +1,17 @@
+{
+  "typescript.format.enable": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.fixAll.eslint": true
+  },
+  "editor.formatOnSave": true,
+  "eslint.debug": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.suggest.autoImports": false,
+  "vscode-graphql.showExecCodelens": false,
+  "tailwindCSS.experimental.classRegex": ["(?:tailwind)\\(([^)]*)\\)", "tw`([^`]*)"],
+  "editor.quickSuggestions": {
+    "strings": true
+  }
+}
